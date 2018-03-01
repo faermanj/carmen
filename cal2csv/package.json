@@ -1,0 +1,15 @@
+{
+  "name": "cal2csv",
+  "version": "1.0.0",
+  "description": "Get data out of outlook",
+  "main": "./target/index.js",
+  "scripts": {
+    "build": "./build.sh",
+    "cal2csv": "./target/cal2csv.js"
+  },
+  "bin": {
+    "cal2csv": "./target/cal2csv.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
