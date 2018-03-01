@@ -1,6 +1,9 @@
 {{#each events}}
-<a>{{subject}}</a>
+<p>
+<b><a href="">{{subject}}</a><b>
+<br/>
 Date: {{startDate}}
+<br/>
 Location: {{location}}
-
+</p>
 {{/each}}
