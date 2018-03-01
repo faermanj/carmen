@@ -11,5 +11,8 @@
     "cal2csv": "./target/cal2csv.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "handlebars": "^4.0.11"
+  }
 }

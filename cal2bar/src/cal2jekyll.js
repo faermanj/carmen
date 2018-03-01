@@ -27,7 +27,7 @@ var replacements = {
   8364: "EUR"
 };
 
-String.prototype.sanitizeEncoding = function() {
+String.prototype.sanitizeEncoding = function () {
   var str = this;
   var result = "";
   for (j = 0; j < str.length; j++) {
@@ -46,7 +46,7 @@ String.prototype.sanitizeEncoding = function() {
   return result;
 };
 
-String.prototype.sanitizeKeyValue = function() {
+String.prototype.sanitizeKeyValue = function () {
   var result = "";
   var lines = this.split("\n");
   for (var i = 0; i < lines.length; i++) {
@@ -179,18 +179,7 @@ function toYAML(event) {
   return eventOut;
 }
 
-function getEnv(varName, defaultValue) {
-  var result = "";
-  try {
-    ObjC.import("stdlib");
-    result = $.getenv(varName);
-  } catch (e) {
-    console.log(e);
-    result = defaultValue;
-  }
-  console.log(`${varName} = ${result}`);
-  return result;
-}
+
 
 function hasCategory(event, categories) {
   var evtcategories = event.categories();

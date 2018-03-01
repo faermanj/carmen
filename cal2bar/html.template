@@ -1,0 +1,6 @@
+{{#each events}}
+<a>{{subject}}</a>
+Date: {{startDate}}
+Location: {{location}}
+
+{{/each}}
