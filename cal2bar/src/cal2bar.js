@@ -1,5 +1,9 @@
 var os = require("./jxa-os");
+var program = require('commander');
 
+var fmts = {
+    "csv": "{{#each events}}\n{{id}}\n{{/each}}"
+}
 
 function pad00(x) {
     return x < 10 ? `0${x}` : `${x}`;
@@ -59,13 +63,23 @@ function flatten(event) {
     }
 }
 
+function list(val) {
+    return val.split(',');
+}
+
 function cal2bar() {
-    var eventsOut = [];
     var now = new Date();
-    var arguments = os.arguments();
-    //console.log(arguments);
+    var eventsOut = [];
     var user = os.getEnv("USER");
-    var categories = ["Event", "Twitch"]
+    var arguments = os.arguments();
+    program
+        .option('-f, --format <format>', 'The format or template to use.', 'csv')
+        .option('-c, --categories <categories>', 'The comma separated list of categories to include', list, ["Twitch", "Events"])
+        .parse(arguments);
+    var fmt = program.format;
+    var categories = program.categories;
+    console.log(categories)
+    console.log(typeof categories)
     var outlook = Application("Microsoft Outlook");
     var events = outlook.calendarEvents();
     for (var eventId in events) {
@@ -79,12 +93,11 @@ function cal2bar() {
         now: now,
         events: eventsOut
     };
-    var output = "html";
-    var source = os.readFile("./" + output + ".template");
+    var source = fmts[fmt] || os.readFile("./" + fmt + ".template");
     var bars = require('handlebars');
     var template = bars.compile(source);
-    var html = template(context);
-    console.log(html);
+    var result = template(context);
+    console.log(result);
     os.exit(0);
 }
 
