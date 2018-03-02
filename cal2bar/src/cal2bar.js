@@ -2,7 +2,7 @@ var os = require("./jxa-os");
 var program = require('commander');
 
 var fmts = {
-    "csv": "{{#each events}}\n{{id}}\n{{/each}}"
+    "csv": "{{#each events}}\n{{id}},{{subject}},{{startTime}}\n{{/each}}"
 }
 
 function pad00(x) {
@@ -78,8 +78,6 @@ function cal2bar() {
         .parse(arguments);
     var fmt = program.format;
     var categories = program.categories;
-    console.log(categories)
-    console.log(typeof categories)
     var outlook = Application("Microsoft Outlook");
     var events = outlook.calendarEvents();
     for (var eventId in events) {
