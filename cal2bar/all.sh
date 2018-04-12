@@ -1,1 +1,0 @@
-npm run build && ./target/cal2bar.js > ./target/out.html 2<&1 && cat ./target/out.html

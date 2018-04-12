@@ -1,14 +1,14 @@
 {
-  "name": "cal2csv",
+  "name": "calstache",
   "version": "1.0.0",
   "description": "Get data out of outlook",
   "main": "./target/index.js",
   "scripts": {
     "build": "./build.sh",
-    "cal2csv": "./target/cal2csv.js"
+    "cal2csv": "./target/calstache.js"
   },
   "bin": {
-    "cal2csv": "./target/cal2csv.js"
+    "cal2csv": "./target/calstache.js"
   },
   "author": "",
   "license": "ISC",

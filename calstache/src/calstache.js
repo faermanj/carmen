@@ -39,38 +39,102 @@ function hasCategory(event, categories) {
 }
 
 function categoriesOf(event) {
-    var result = "\"";
+    var result = "";
     var categories = event.categories();
     for (var i = 0; i < categories.length; i++) {
-        var cat = categories[i].name();
+        var cat = categories[i].name().toLowerCase();
         result += cat;
         if (i < categories.length - 1) result += ",";
     }
-    result += "\"";
+    result += "";
     return result;
 }
 
+function categoryOf(event) {
+    var categories = event.categories();
+    return categories.length && categories[0].name().toLowerCase();
+}
 
+function contains(str, match) {
+    if ((!str) || (!match)) return false;
+    var arr = match;
+    if (!Array.isArray(arr))
+        arr = [arr];
+    for (var i = 0; i < arr.length; i++) {
+        var currMatch = arr[i];
+        var contains = str.toLowerCase().indexOf(currMatch.toLowerCase()) > -1;
+        if (contains) return true;
+    }
+}
 
-function flatten(event) {
+function regionOf(location) {
+    if (contains(location, ["usa", "canada"])) return "Americas";
+    if (contains(location, "singapore")) return "APAC";
+    if (contains(location, ["spain", "portugal", "sweden"])
+    ) return "EMEA";
+    if (contains(location, "china")) return "China";
+    if (contains(location, "japan")) return "Japan";
+    return "WW";
+}
+
+function isEngagement(event) {
+    var categories = categoriesOf(event);
+    var isEngagement = contains(categories, "event")
+        || contains(categories, "pr")
+        || contains(categories, "ar")
+        || contains(categories, "webinar")
+        || contains(categories, "twitch");
+    return isEngagement;
+}
+
+function px(event) {
+    var subject = event.subject();
+    var m = /(\d+)px/.exec(subject);
+    return m ? m[1] : 0;
+}
+
+function titleOf(str) {
+    var newstr = str && str.replace(/\[(.+?)\]/g, "").trim();
+    return newstr;
+}
+
+function flatten(event, globals) {
+    var nowYear = globals.now.getFullYear();
     var startTime = event.startTime();
     var startDate = startTime && startTime.getDate();
     var startMonth = startTime && util.monthName(startTime.getMonth());
     var startYear = startTime && startTime.getFullYear();
-    var startStr = startMonth + " " + startDate + " " + startYear
+    var startStr = startMonth + " " + startDate + " " + startYear;
+    var startISO = startTime && startTime.toISOString();
+    var startISODate = startISO && startISO.substring(0, 10);
+    var isFuture = new Date(event.startTime()) > globals.now;
+    var isPast = !isFuture;
+    var isCurrentYear = nowYear == startYear;
+    var title = titleOf(event.subject());
     return {
         id: event.id(),
-        subject: event.subject(),
         categories: categoriesOf(event),
+        category: categoryOf(event),
+        isEngagement: isEngagement(event),
+        isFuture: isFuture,
+        isPast: isPast,
+        isCurrentYear: isCurrentYear,
+        px: px(event),
         startTime: startTime,
         startDate: startDate,
         startMonth: startMonth,
         startYear: startYear,
         startStr: startStr,
+        startISO: startISO,
+        startISODate: startISODate,
+        subject: event.subject(),
         endTime: event.endTime(),
+        title: title,
         tzName: event.timezone().name,
         tzOffset: event.timezone().offset,
-        location: event.location()
+        user: globals.user,
+        location: event.location(),
+        region: regionOf(event.location())
     }
 }
 
@@ -90,12 +154,15 @@ function allEvents() {
 
 function filter(events, now, categories) {
     var eventsOut = [];
+    var globals = {
+        now: now,
+        user: os.getEnv("USER")
+    }
     for (var eventId in events) {
         var event = events[eventId];
         var hasCateg = hasCategory(event, categories);
-        var isFuture = new Date(event.startTime()) > now;
-        var isIncluded = isFuture && hasCateg;
-        if (isIncluded) eventsOut.push(flatten(event));
+        var isIncluded = hasCateg;
+        if (isIncluded) eventsOut.push(flatten(event, globals));
     }
     return eventsOut;
 }
@@ -118,7 +185,6 @@ function render(eventsOut, fmt) {
 
 function cal2bar() {
     var now = new Date();
-    var user = os.getEnv("USER");
     var arguments = os.arguments();
     program
         .option('-f, --format <format>', 'The format or template to use.', 'csv')
